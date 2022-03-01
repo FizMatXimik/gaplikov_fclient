@@ -3,9 +3,14 @@ package ru.igap.gaplikov_fclient;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import ru.igap.gaplikov_fclient.databinding.ActivityMainBinding;
+
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,9 +42,26 @@ public class MainActivity extends AppCompatActivity {
         }
         System.out.print(equal);
 
+        Toast.makeText(this, "Hello", Toast.LENGTH_SHORT).show();
+
         // Example of a call to a native method
-        TextView tv = findViewById(R.id.sample_text);
-        tv.setText(stringFromJNI());
+//        TextView tv = findViewById(R.id.sample_text);
+//        tv.setText(stringFromJNI());
+    }
+
+    public static byte[] stringToHex(String s) {
+        byte[] hex;
+        try {
+            hex = Hex.decodeHex(s.toCharArray());
+        }
+        catch (DecoderException ex) {
+            hex = null;
+        }
+        return hex;
+    }
+
+    public void onButtonClick(View view) {
+        Toast.makeText(this, "Hello", Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -51,5 +73,4 @@ public class MainActivity extends AppCompatActivity {
     public static native byte[] randomBytes(int no);
     public static native byte[] encrypt(byte[] key, byte[] data);
     public static native byte[] decrypt(byte[] key, byte[] data);
-
 }
