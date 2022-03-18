@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,7 +21,14 @@ import org.apache.commons.codec.binary.Hex;
 
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity {
+
+
+interface TransactionEvents {
+    String enterPin(int ptc, String amount);
+    void transactionResult(boolean result);
+}
+
+public class MainActivity extends AppCompatActivity implements TransactionEvents {
 
     // Used to load the 'gaplikov_fclient' library on application startup.
     static {
@@ -28,8 +36,11 @@ public class MainActivity extends AppCompatActivity {
         System.loadLibrary("mbedcrypto");
 
     }
+
     ActivityResultLauncher activityResultLauncher;
     private ActivityMainBinding binding;
+    private static final String TAG = "gaplikov_fclient";
+    private String pin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +54,12 @@ public class MainActivity extends AppCompatActivity {
                     public void onActivityResult(ActivityResult result) {
                         if (result.getResultCode() == Activity.RESULT_OK) {
                             Intent data = result.getData();
-                            String pin = data.getStringExtra("pin");
-                            Toast.makeText(MainActivity.this, pin, Toast.LENGTH_SHORT).show();
+//                            String pin = data.getStringExtra("pin");
+//                            Toast.makeText(MainActivity.this, pin, Toast.LENGTH_SHORT).show();
+                            pin = data.getStringExtra("pin");
+                            synchronized (MainActivity.this) {
+                                MainActivity.this.notifyAll();
+                            }
                         }
                     }
                 });
@@ -67,6 +82,30 @@ public class MainActivity extends AppCompatActivity {
 //        tv.setText(stringFromJNI());
     }
 
+    @Override
+    public String enterPin(int ptc, String amount) {
+        pin = new String();
+        Intent it = new Intent(MainActivity.this, PinpadActivity.class);
+        it.putExtra("ptc", ptc);
+        it.putExtra("amount", amount);
+        synchronized (MainActivity.this) {
+            activityResultLauncher.launch(it);
+            try {
+                MainActivity.this.wait();
+            } catch (Exception ex) {
+                Log.e(TAG, "Получено исключение", ex);
+            }
+        }
+        return pin;
+    }
+
+    @Override
+    public void transactionResult(boolean result) {
+        runOnUiThread(()-> {
+            Toast.makeText(MainActivity.this, result ? "ok" : "failed", Toast.LENGTH_SHORT).show();
+        });
+    }
+
     public static byte[] stringToHex(String s) {
         byte[] hex;
         try {
@@ -84,9 +123,17 @@ public class MainActivity extends AppCompatActivity {
 //        byte[] dec = decrypt(key, enc);
 //        String str = new String(Hex.encodeHex(dec)).toUpperCase();
 //        Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
-        Intent it = new Intent(this, PinpadActivity.class);
-        //startActivity(it);
-        activityResultLauncher.launch(it);
+//        Intent it = new Intent(this, PinpadActivity.class);
+//        activityResultLauncher.launch(it);
+        //        //startActivity(it);
+        new Thread(()-> {
+            try {
+                byte[] trd = stringToHex("9F0206000000000100");
+                boolean ok = transaction(trd);
+            } catch (Exception ex) {
+                Log.e(TAG, "Получено исключение", ex);
+            }
+        }).start();
     }
 
     /**
@@ -98,4 +145,5 @@ public class MainActivity extends AppCompatActivity {
     public static native byte[] randomBytes(int no);
     public static native byte[] encrypt(byte[] key, byte[] data);
     public static native byte[] decrypt(byte[] key, byte[] data);
+    public native boolean transaction(byte[] trd);
 }
