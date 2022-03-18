@@ -30,7 +30,7 @@ JNIEnv* getEnv (bool& detach)
     detach = false;
     if (status == JNI_EDETACHED)
     {
-        status = gJvm->AttachCurrentThread (&env, NULL);
+        status = gJvm->AttachCurrentThread (&env, NULL); // Обязаны подключить поток в машине, это делается автоматически при вызове сверху, но мы должны это сделать сами
         if (status < 0)
         {
             return nullptr;

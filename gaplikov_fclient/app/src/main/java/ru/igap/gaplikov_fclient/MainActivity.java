@@ -125,15 +125,9 @@ public class MainActivity extends AppCompatActivity implements TransactionEvents
 //        Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
 //        Intent it = new Intent(this, PinpadActivity.class);
 //        activityResultLauncher.launch(it);
-        //        //startActivity(it);
-        new Thread(()-> {
-            try {
-                byte[] trd = stringToHex("9F0206000000000100");
-                boolean ok = transaction(trd);
-            } catch (Exception ex) {
-                Log.e(TAG, "Получено исключение", ex);
-            }
-        }).start();
+//        //startActivity(it);
+        byte[] trd = stringToHex("9F0206000000000100");
+        boolean ok = transaction(trd);
     }
 
     /**
