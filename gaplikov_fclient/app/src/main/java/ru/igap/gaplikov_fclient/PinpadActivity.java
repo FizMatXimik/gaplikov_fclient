@@ -14,7 +14,6 @@ public class PinpadActivity extends AppCompatActivity {
 
     TextView tvPin;
     String pin = "";
-    //final int MAX_KEYS = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +39,8 @@ public class PinpadActivity extends AppCompatActivity {
         TextView ta = findViewById(R.id.txtAmount);
         String amt = String.valueOf(getIntent().getStringExtra("amount"));
         Long f = Long.valueOf(amt);
-        DecimalFormat df = new DecimalFormat("#,###,###,##0.00");
-        String s = df.format(f);
+        DecimalFormat df = new DecimalFormat("#,###,###,###.00");
+        String s = df.format(f/100f);
         ta.setText("Сумма: " + s);
         TextView tp = findViewById(R.id.txtPtc);
         int pts = getIntent().getIntExtra("ptc", 0);
