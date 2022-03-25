@@ -1,0 +1,15 @@
+gaplikov_fclient/*.iml
+gaplikov_fclient/.gradle
+gaplikov_fclient/local.properties
+gaplikov_fclient/.idea/caches
+gaplikov_fclient/.idea/libraries
+gaplikov_fclient/.idea/modules.xml
+gaplikov_fclient/.idea/workspace.xml
+gaplikov_fclient/.idea/navEditor.xml
+gaplikov_fclient/.idea/assetWizardSettings.xml
+gaplikov_fclient/.DS_Store
+gaplikov_fclient/build
+gaplikov_fclient/captures
+gaplikov_fclient/.externalNativeBuild
+gaplikov_fclient/.cxx
+gaplikov_fclient/local.properties
