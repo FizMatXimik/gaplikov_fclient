@@ -11,7 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Gaplikov_fclient"
         android:usesCleartextTraffic="true"
-        tools:targetApi="m">
+        >
         <activity
             android:name=".PinpadActivity"
             android:exported="false" />
