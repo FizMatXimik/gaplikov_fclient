@@ -18,10 +18,14 @@ import ru.igap.gaplikov_fclient.databinding.ActivityMainBinding;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.io.IOUtils;
 
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Locale;
-
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 interface TransactionEvents {
     String enterPin(int ptc, String amount);
@@ -98,8 +102,37 @@ public class MainActivity extends AppCompatActivity implements TransactionEvents
     }
 
     public void onButtonClick(View view) {
-        byte[] trd = stringToHex("9F0206000000099999");
-        boolean ok = transaction(trd);
+//        byte[] trd = stringToHex("9F0206000000099999");
+//        boolean ok = transaction(trd);
+        testHttpClient();
+    }
+
+    protected void testHttpClient()
+    {
+        new Thread(() -> {
+            try {
+                HttpURLConnection uc = (HttpURLConnection)(new URL("https://www.wikipedia.org").openConnection());
+                InputStream inputStream = uc.getInputStream();
+                String html = IOUtils.toString(inputStream);
+                String title = getPageTitle(html);
+                runOnUiThread(() -> {
+                    Toast.makeText(this, title, Toast.LENGTH_LONG).show();
+                });
+            } catch (Exception ex) {
+                Log.e("fapptag", "Http client fails", ex);
+            }
+        }).start();
+    }
+
+    private String getPageTitle(String html) {
+        Pattern pattern = Pattern.compile("<title>(.+?)</title>", Pattern.DOTALL);
+        Matcher matcher = pattern.matcher(html);
+        String p;
+        if (matcher.find())
+            p = matcher.group(1);
+        else
+            p = "Not found";
+        return p;
     }
 
     public native String stringFromJNI();

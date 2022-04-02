@@ -1,7 +1,2 @@
 ninja: Entering directory `/home/aleksandr/AndroidStudioProjects/gaplikov_fclient/app/.cxx/Debug/3ga111p5/x86'
-[1/2] Building CXX object CMakeFiles/native-lib.dir/native-lib.cpp.o
-/home/aleksandr/AndroidStudioProjects/gaplikov_fclient/app/src/main/cpp/native-lib.cpp:13:25: warning: ISO C++11 does not allow conversion from string literal to 'char *' [-Wwritable-strings]
-char *personalization = "gaplikov_fclient-sample-app";
-                        ^
-1 warning generated.
-[2/2] Linking CXX shared library /home/aleksandr/AndroidStudioProjects/gaplikov_fclient/app/build/intermediates/cxx/Debug/3ga111p5/obj/x86/libnative-lib.so
+ninja: no work to do.
