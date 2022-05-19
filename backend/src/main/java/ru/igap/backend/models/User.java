@@ -1,6 +1,8 @@
 package ru.igap.backend.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
+import ru.igap.backend.tools.View;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -17,9 +19,11 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonView(View.REST.class)
     @Column(name = "id", updatable = false, nullable = false)
     public Long id;
 
+    @JsonView(View.REST.class)
     @Column(name = "login", unique = true, nullable = false)
     public String login;
 
@@ -27,6 +31,7 @@ public class User {
     @Column(name = "password")
     public String password;
 
+    @JsonView(View.REST.class)
     @Column(name = "email", unique = true, nullable = false)
     public String email;
 
@@ -34,12 +39,15 @@ public class User {
     @Column(name = "salt")
     public String salt;
 
+    @JsonView(View.LOGIN.class)
     @Column(name = "token")
     public String token;
 
+    @JsonView(View.REST.class)
     @Column(name = "activity")
     public LocalDateTime activity;
 
+    @JsonView(View.REST.class)
     @ManyToMany(mappedBy = "users")
     public Set<Museum> museums = new HashSet<>();
 

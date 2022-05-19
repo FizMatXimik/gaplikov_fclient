@@ -1,5 +1,6 @@
 package ru.igap.backend.controllers;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import ru.igap.backend.models.Museum;
 import ru.igap.backend.models.User;
 import ru.igap.backend.repositories.MuseumRepository;
 import ru.igap.backend.repositories.UserRepository;
+import ru.igap.backend.tools.View;
 
 import javax.validation.Valid;
 import java.util.*;
@@ -24,11 +26,13 @@ public class UserController {
     MuseumRepository museumRepository;
 
     @GetMapping("/users")
+    @JsonView(View.REST.class)
     public List getAllUsers() {
         return userRepository.findAll();
     }
 
     @PostMapping("/users")
+    @JsonView(View.REST.class)
     public ResponseEntity<Object> createUser(@RequestBody User user) throws Exception {
         try {
             User nc = userRepository.save(user);
@@ -47,6 +51,7 @@ public class UserController {
     }
 
     @PutMapping("/users/{id}")
+    @JsonView(View.REST.class)
     public ResponseEntity<User> updateUser(@PathVariable(value = "id") Long userId, @RequestBody User userDetails) {
         User user = null;
         Optional<User> uu = userRepository.findById(userId);

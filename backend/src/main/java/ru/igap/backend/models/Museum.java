@@ -7,7 +7,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonView;
 import ru.igap.backend.models.User;
+import ru.igap.backend.tools.View;
 
 @Entity
 @Table(name = "museums")
@@ -22,12 +25,15 @@ public class Museum {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonView(View.REST.class)
     @Column(name = "id", updatable = false, nullable = false)
     public long id;
 
+    @JsonView(View.REST.class)
     @Column(name = "name", nullable = false, unique = true)
     public String name;
 
+    @JsonView(View.REST.class)
     @Column(name = "location", nullable = false)
     public String location;
 
