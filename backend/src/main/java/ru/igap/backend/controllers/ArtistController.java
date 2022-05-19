@@ -6,13 +6,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.igap.backend.models.Artist;
 import ru.igap.backend.models.Country;
+import ru.igap.backend.models.Painting;
 import ru.igap.backend.repositories.ArtistRepository;
 import ru.igap.backend.repositories.CountryRepository;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -27,6 +25,15 @@ public class ArtistController {
     @GetMapping("/artists")
     public List getAllArtists() {
         return artistRepository.findAll();
+    }
+
+    @GetMapping("/artists/{id}/paintings")
+    public ResponseEntity<List<Painting>> getArtistPaintings(@PathVariable(value="id") Long artistId) {
+        Optional<Artist> cc = artistRepository.findById(artistId);
+        if (cc.isPresent()) {
+            return ResponseEntity.ok(cc.get().paintings);
+        }
+        return ResponseEntity.ok(new ArrayList<Painting>());
     }
 
     @PostMapping("/artists")

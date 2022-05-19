@@ -29,7 +29,7 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public ResponseEntity<Object> createMuseum(@RequestBody User user) throws Exception {
+    public ResponseEntity<Object> createUser(@RequestBody User user) throws Exception {
         try {
             User nc = userRepository.save(user);
             return new ResponseEntity<Object>(nc, HttpStatus.OK);
@@ -59,6 +59,19 @@ public class UserController {
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found!");
         }
+    }
+
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<Object> deleteUser(@PathVariable(value = "id") Long userId) {
+        Optional<User> user = userRepository.findById(userId);
+        Map<String, Boolean> resp = new HashMap<>();
+        if (user.isPresent()) {
+            userRepository.delete(user.get());
+            resp.put("deleted", Boolean.TRUE);
+        }
+        else
+            resp.put("deleted", Boolean.FALSE);
+        return ResponseEntity.ok(resp);
     }
 
     @PostMapping("/users/{id}/addmuseums")

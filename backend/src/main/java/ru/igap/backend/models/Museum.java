@@ -3,7 +3,9 @@ package ru.igap.backend.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import ru.igap.backend.models.User;
 
@@ -29,10 +31,10 @@ public class Museum {
     @Column(name = "location", nullable = false)
     public String location;
 
-//    @JsonIgnore
-//    @OneToMany
-//    public List<Painting>
-//            paintings = new ArrayList<>();
+    @JsonIgnore
+    @OneToMany(mappedBy = "museum")
+    public List<Painting> paintings = new ArrayList<Painting>();
+
     @JsonIgnore
     @ManyToMany
     @JoinTable(name = "usersmuseums", joinColumns = @JoinColumn(name = "museums"), inverseJoinColumns = @JoinColumn(name = "users"))

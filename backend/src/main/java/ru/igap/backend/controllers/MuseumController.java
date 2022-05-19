@@ -5,12 +5,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.igap.backend.models.Museum;
+import ru.igap.backend.models.Painting;
 import ru.igap.backend.repositories.MuseumRepository;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -22,6 +20,15 @@ public class MuseumController {
     @GetMapping("/museums")
     public List getAllMuseums() {
         return museumRepository.findAll();
+    }
+
+    @GetMapping("/museums/{id}/paintings")
+    public ResponseEntity<List<Painting>> getArtistPaintings(@PathVariable(value="id") Long museumId) {
+        Optional<Museum> cc = museumRepository.findById(museumId);
+        if (cc.isPresent()) {
+            return ResponseEntity.ok(cc.get().paintings);
+        }
+        return ResponseEntity.ok(new ArrayList<Painting>());
     }
 
     @PostMapping("/museums")
