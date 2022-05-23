@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navbar, Nav } from 'react-bootstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {faHome, faUser} from '@fortawesome/free-solid-svg-icons'
+import {faBars, faHome, faUser} from '@fortawesome/free-solid-svg-icons'
 import {Link, useNavigate} from 'react-router-dom';
 import Utils from "../utils/Utils";
 import BackendService from "../services/BackendService";
@@ -21,7 +21,13 @@ const NavigationBar = (props) => {
 
     return (
         <Navbar bg="light" expand="lg">
-            <Navbar.Brand><FontAwesomeIcon icon={faHome} />{' '}Gaplikov RPO</Navbar.Brand>
+            <button type="button"
+                    style={{marginLeft: "10px"}}
+                    className="btn btn-outline-secondary mr-2"
+                    onClick={props.toggleSideBar}>
+                <FontAwesomeIcon icon={faBars} />
+            </button>
+            <Navbar.Brand style={{marginLeft: "10px"}}>Gaplikov RPO</Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="me-auto">
