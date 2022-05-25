@@ -1,13 +1,19 @@
 package ru.igap.backend.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.igap.backend.models.Country;
 import ru.igap.backend.models.Museum;
 import ru.igap.backend.models.Painting;
 import ru.igap.backend.repositories.MuseumRepository;
+import ru.igap.backend.tools.DataValidationException;
 
+import javax.validation.Valid;
 import java.util.*;
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -19,8 +25,15 @@ public class MuseumController {
     MuseumRepository museumRepository;
 
     @GetMapping("/museums")
-    public List getAllMuseums() {
-        return museumRepository.findAll();
+    public Page<Museum> getAllMuseums(@RequestParam("page") int page, @RequestParam("limit") int limit) {
+        return museumRepository.findAll(PageRequest.of(page, limit, Sort.by(Sort.Direction.ASC, "name")));
+    }
+
+    @GetMapping("/museums/{id}")
+    public ResponseEntity<Museum> getMuseum(@PathVariable(value = "id") Long museumId)
+            throws DataValidationException {
+        Museum museum = museumRepository.findById(museumId).orElseThrow(()->new DataValidationException("Музей с таким индексом не найден"));
+        return ResponseEntity.ok(museum);
     }
 
     @GetMapping("/museums/{id}/paintings")
@@ -33,21 +46,40 @@ public class MuseumController {
     }
 
     @PostMapping("/museums")
-    public ResponseEntity<Object> createMuseum(@RequestBody Museum museum) throws Exception {
+    public ResponseEntity<Object> createMuseum(@RequestBody Museum museum) throws DataValidationException {
         try {
             Museum nc = museumRepository.save(museum);
             return new ResponseEntity<Object>(nc, HttpStatus.OK);
         }
         catch(Exception ex) {
-            String error;
-            if (ex.getMessage().contains("museums.name_UNIQUE"))
-                error = "museumalreadyexists";
+            if (ex.getMessage().contains("museum.name_UNIQUE"))
+                throw new DataValidationException("Этот музей уже есть в базе");
             else
-                error = ex.getMessage();
-            Map<String, String> map = new HashMap<>();
-            map.put("error", error);
-            return ResponseEntity.ok(map);
+                throw new DataValidationException("Неизвестная ошибка");
         }
+    }
+
+    @PutMapping("/museums/{id}")
+    public ResponseEntity<Museum> updateMuseum(@PathVariable(value = "id") Long museumId, @Valid @RequestBody Museum museumDetails)  throws DataValidationException{
+        try {
+            Museum museum = museumRepository.findById(museumId).orElseThrow(() -> new DataValidationException("Музей с таким индексом не найден"));
+            museum.name = museumDetails.name;
+            museum.location = museumDetails.location;
+            museumRepository.save(museum);
+            return ResponseEntity.ok(museum);
+        }
+        catch (Exception ex) {
+            if (ex.getMessage().contains("museum.name_UNIQUE"))
+                throw new DataValidationException("Этот музей уже есть в базе");
+            else
+                throw new DataValidationException("Неизвестная ошибка");
+        }
+    }
+
+    @PostMapping("/deletemuseums")
+    public ResponseEntity<Object> deleteMuseums(@Valid @RequestBody List<Museum> museums) {
+        museumRepository.deleteAll(museums);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 

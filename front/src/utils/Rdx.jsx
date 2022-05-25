@@ -1,5 +1,5 @@
 import Utils from "./Utils";
-import {applyMiddleware, combineReducers, legacy_createStore as createStore} from "redux";
+import {applyMiddleware, combineReducers, createStore} from "redux";
 
 /* ACTIONS */
 const userConstants = {

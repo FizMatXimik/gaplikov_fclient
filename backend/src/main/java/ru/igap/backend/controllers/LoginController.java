@@ -40,7 +40,6 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    @JsonView(View.LOGIN.class)
     public ResponseEntity<Object> login(@RequestBody Map<String, String> credentials) {
         String login = credentials.get("login");
         String pwd = credentials.get("password");

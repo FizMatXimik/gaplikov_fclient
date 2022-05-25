@@ -1,6 +1,9 @@
 package ru.igap.backend.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +14,9 @@ import ru.igap.backend.models.Painting;
 import ru.igap.backend.repositories.ArtistRepository;
 import ru.igap.backend.repositories.MuseumRepository;
 import ru.igap.backend.repositories.PaintingRepository;
+import ru.igap.backend.tools.DataValidationException;
 
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,33 +38,57 @@ public class PaintingController {
 
 
     @GetMapping("/paintings")
-    public List getAllPaintings() {
-        return paintingRepository.findAll();
+    public Page getAllPaintings(@RequestParam("page") int page, @RequestParam("limit") int limit) {
+        return paintingRepository.findAll(PageRequest.of(page, limit, Sort.by(Sort.Direction.ASC, "name")));
+    }
+
+    @GetMapping("/paintings/{id}")
+    public ResponseEntity getPainting(@PathVariable(value = "id") Long paintingId)
+            throws DataValidationException
+    {
+        Painting painting = paintingRepository.findById(paintingId)
+                .orElseThrow(()-> new DataValidationException("Картина с таким индексом не найдена"));
+        return ResponseEntity.ok(painting);
     }
 
     @PostMapping("/paintings")
-    public ResponseEntity<Object> createPainting(@RequestBody Painting painting) throws Exception {
+    public ResponseEntity<Object> createPainting(@RequestBody Painting painting) throws DataValidationException {
         try {
-            Optional<Artist> aa = artistRepository.findById(painting.artist.id);
-            if (aa.isPresent()) {
-                painting.artist = aa.get();
-            }
-            Optional<Museum> mm = museumRepository.findById(painting.museum.id);
-            if (mm.isPresent()) {
-                painting.museum = mm.get();
-            }
+            painting.artist = artistRepository.findByName(painting.artist.name).orElseThrow(() -> new DataValidationException("Художник с таким индексом не найден"));
+            painting.museum = museumRepository.findByName(painting.museum.name).orElseThrow(() -> new DataValidationException("Музей с таким индексом не найден"));
             Painting nc = paintingRepository.save(painting);
             return new ResponseEntity<Object>(nc, HttpStatus.OK);
         }
         catch(Exception ex) {
-            String error;
-            if (ex.getMessage().contains("painting.name_UNIQUE"))
-                error = "paintingalreadyexists";
+            if (ex.getMessage().contains("paintings.name_UNIQUE"))
+                throw new DataValidationException("Эта картина уже есть в базе");
             else
-                error = ex.getMessage();
-            Map<String, String> map = new HashMap<>();
-            map.put("error", error);
-            return ResponseEntity.ok(map);
+                throw new DataValidationException("Неизвестная ошибка");
         }
+    }
+
+    @PutMapping("/paintings/{id}")
+    public ResponseEntity<Painting> updatePainting(@PathVariable(value = "id") Long paintingId, @Valid @RequestBody Painting paintingDetails)  throws DataValidationException{
+        try {
+            Painting painting = paintingRepository.findById(paintingId).orElseThrow(() -> new DataValidationException("Картина с таким индексом не найдена"));
+            painting.name = paintingDetails.name;
+            painting.artist = artistRepository.findByName(paintingDetails.artist.name).orElseThrow(() -> new DataValidationException("Художник с таким именем не найден"));
+            painting.museum = museumRepository.findByName(paintingDetails.museum.name).orElseThrow(() -> new DataValidationException("Музей с таким именем не найден"));
+            painting.year = paintingDetails.year;
+            paintingRepository.save(painting);
+            return ResponseEntity.ok(painting);
+        }
+        catch (Exception ex) {
+            if (ex.getMessage().contains("paintings.name_UNIQUE"))
+                throw new DataValidationException("Эта картина уже есть в базе");
+            else
+                throw new DataValidationException("Неизвестная ошибка");
+        }
+    }
+
+    @PostMapping("/deletepaintings")
+    public ResponseEntity<Object> deletePaintings(@Valid @RequestBody List<Painting> paintings) {
+        paintingRepository.deleteAll(paintings);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

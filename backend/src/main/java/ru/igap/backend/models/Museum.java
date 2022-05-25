@@ -25,15 +25,15 @@ public class Museum {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonView(View.REST.class)
+
     @Column(name = "id", updatable = false, nullable = false)
     public long id;
 
-    @JsonView(View.REST.class)
+
     @Column(name = "name", nullable = false, unique = true)
     public String name;
 
-    @JsonView(View.REST.class)
+
     @Column(name = "location", nullable = false)
     public String location;
 
